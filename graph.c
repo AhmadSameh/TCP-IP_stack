@@ -1,10 +1,8 @@
 #include "graph.h"
-#include "gluethreads/glthreads.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-GLTHREAD_TO_STRUCT(graph_glue_to_node, node_t, graph_glue)
+#include <memory.h>
 
 static int get_node_intf_available(node_t* node){
 	for(int i=0; i<MAX_INTF_PER_NODE; i++){
@@ -15,7 +13,7 @@ static int get_node_intf_available(node_t* node){
 	return -1;
 }
 
-static node_t* get_nbr_node(interface_t* intf){
+node_t* get_nbr_node(interface_t* intf){
 	link_t* link = intf->link;
 	if(intf == &link->intf1)
 		return link->intf2.att_node;
@@ -35,6 +33,7 @@ node_t* create_graph_node(graph_t* graph, char* node_name){
 	node_t* node = calloc(1, sizeof(node_t));
 	strncpy(node->node_name, node_name, NODE_NAME_SIZE);
 	node->node_name[NODE_NAME_SIZE] = '\0';
+	init_node_nw_prop(&node->node_nw_prop);
 	glthread_add(&graph->node_list, &node->graph_glue);
 	return node;
 }
@@ -60,6 +59,11 @@ void insert_link_between_two_nodes(node_t* node1, node_t* node2, char* from_if_n
 	node1->intf[empty_intf_slot] = &link->intf1;
 	empty_intf_slot = get_node_intf_available(node2);
 	node2->intf[empty_intf_slot] = &link->intf2;
+	
+	init_intf_nw_prop(&link->intf1.intf_nw_prop);
+	init_intf_nw_prop(&link->intf2.intf_nw_prop);
+	interface_assign_mac(&link->intf1);
+	interface_assign_mac(&link->intf2);
 }
 
 void dump_graph(graph_t* graph){

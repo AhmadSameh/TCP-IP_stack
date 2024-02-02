@@ -29,5 +29,21 @@ graph_t* build_first_topo(){
 	insert_link_between_two_nodes(R0, R1, "eth0/0", "eth0/1", 1);
 	insert_link_between_two_nodes(R1, R2, "eth0/2", "eth0/3", 1);
 	insert_link_between_two_nodes(R0, R2, "eth0/4", "eth0/5", 1);
+	// add network properties
+	set_device_type(R0, L3_ROUTER);
+	node_set_loopback_address(R0, "122.1.1.0");	
+	node_set_intf_ip_address(R0, "eth0/0", "20.1.1.1", 24);
+	node_set_intf_ip_address(R0, "eth0/4", "40.1.1.1", 24);
+
+	set_device_type(R1, L3_ROUTER);
+	node_set_loopback_address(R1, "122.1.1.1");	
+	node_set_intf_ip_address(R1, "eth0/1", "20.1.1.2", 24);
+	node_set_intf_ip_address(R1, "eth0/2", "30.1.1.1", 24);
+
+	set_device_type(R2, L3_ROUTER);
+	node_set_loopback_address(R2, "122.1.1.2");
+	node_set_intf_ip_address(R2, "eth0/3", "30.1.1.2", 24);
+	node_set_intf_ip_address(R2, "eth0/5", "40.1.1.2", 24);
+
 	return topo;
 }
